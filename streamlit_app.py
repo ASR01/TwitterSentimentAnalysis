@@ -31,6 +31,7 @@ map_result = {'LABEL_0':'Negative',
               'LABEL_2':'Positive'}
 
 tweets_found = False
+tweet_params = ''#lang:en '
 
 
 
@@ -91,16 +92,20 @@ col1, col2 = st.columns([1, 1])
 with col1:
 	startdate = st.date_input('Pick a start date', min_date)
 	username = st.text_input('Twitter username without the @ sign', 'elonmusk')
+	if username != '':
+		username = ' from:' + username
+		print(username)
 with col2:
 	enddate = st.date_input('Pick an end date', max_date)
-	number_tweets = st.slider('Number fo tweets to analyze (max = 50)', 0, 50, 10 )
+	number_tweets = st.slider('Number fo tweets to analyze (max = 50)', 10, 100, 10 )
 
-issue = st.text_input("Insert the search words ( # hashtags allowed)")
+issue = st.text_input("Insert the search words ( # hashtags allowed), the sentiment analysis works only in English")
 
 startdate = datetime.combine(startdate, datetime.min.time())
 enddate = datetime.combine(enddate, datetime.min.time())
 
-request_text = 'from:' + username + ' ' + issue
+request_text = tweet_params + username + ' ' + issue
+print(request_text)
 
 tweets = get_tweets(request_text, startdate, enddate, number_tweets)
 if tweets.data != None:
@@ -116,13 +121,14 @@ if tweets.data != None:
 	datalist = []
 	for text in tweet_texts:
 		data = model_query(text, HF_MODEL_ID, HF_API_TOKEN)
+		print(data)
 		if data is None:
 			tweets_found = False
 		else:
 			tweets_found = True
 			dict = {}
 			for e in data[0]:
-				# print(e)
+				print(e)
 				dict[e['label']] = e['score']
 			datalist.append(dict)
  
